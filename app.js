@@ -176,3 +176,4 @@ app.get("/productos/precio-menor/:precio", (req, res) => {
         res.status(404).json(petitionStructure(404, "No hay productos con precio menor a " + precio, null))
     }
 })
+//
