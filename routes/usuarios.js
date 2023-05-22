@@ -1,6 +1,12 @@
 const express = require("express")
-const router = express.Router()
+const VALIDAR_VACIOS = require("../middleware/validar_vacios")
 let USUARIOS = require('../models/usuario')
+
+let router = express.Router()
+
+router.use(express.json())
+router.use(VALIDAR_VACIOS)
+
 
 const petitionStructure = ($status, message, response) => {
     if(response !== null && $status >= 199 && $status <= 399){
@@ -36,21 +42,28 @@ router.get("/:id", (req, res) => {
 })
 
 //-------------------- 9 ---------------------
-router.use(express.json())
-router.post("/", (req, res) => {
-    try{
-        const id = USUARIOS.length + 1
-        const nombre = req.body?.nombre
-        const apellido = req.body.apellido
-        const edad = req.body.edad
+router.post("/", VALIDAR_VACIOS, (req, res) => {
+    console.log(0)
+    if(!req.errMsg){
+        console.log(1)
+        try{
+            const id = USUARIOS.length + 1
+            const nombre = req.body?.nombre
+            const apellido = req.body.apellido
+            const edad = req.body.edad
 
-        USUARIOS.push({ id, nombre, apellido, edad })
+            USUARIOS.push({ id, nombre, apellido, edad })
 
-        const nuevoUsuario = USUARIOS.find(u => u.id === id)
-        res.status(201).json(petitionStructure(201, "ok", nuevoUsuario))
-    }catch (e){
-        res.status(500).json(petitionStructure(500, "bad", null))
+            const nuevoUsuario = USUARIOS.find(u => u.id === id)
+            res.status(201).json(petitionStructure(201, "ok", nuevoUsuario))
+        }catch (e){
+            res.status(500).json(petitionStructure(500, "bad", null))
+        }
+    }else{
+        console.log("2")
+        res.status(400).send(petitionStructure(400, req.errMsg, null))
     }
+
 })
 
 //-------------------- 10 ---------------------
